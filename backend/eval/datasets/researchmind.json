@@ -1,0 +1,24 @@
+{
+  "repo_name": "Researchmind",
+  "source_url": "https://github.com/vishxl08/Researchmind",
+  "cases": [
+    {"question": "What does backend/manage.py do?", "expected_files": ["backend/manage.py"]},
+    {"question": "What does the FastAPI app in fastapi_app.py do?", "expected_files": ["backend/fastapi_app.py"]},
+    {"question": "Where is the LangGraph agent orchestration defined?", "expected_files": ["backend/agent/graph.py"]},
+    {"question": "Where are the AI tools like search and calculator implemented?", "expected_files": ["backend/agent/tools.py"]},
+    {"question": "How does the agent manage memory with Qdrant?", "expected_files": ["backend/agent/memory.py"]},
+    {"question": "What runs or executes the agent?", "expected_files": ["backend/agent/runner.py"]},
+    {"question": "Where are the LLM prompts defined?", "expected_files": ["backend/agent/prompts.py"]},
+    {"question": "What models represent a research job or report?", "expected_files": ["backend/research/models.py"]},
+    {"question": "Where are the research API endpoints defined?", "expected_files": ["backend/research/views.py"]},
+    {"question": "How does the WebSocket consumer work?", "expected_files": ["backend/research/consumers.py"]},
+    {"question": "Where are Celery background tasks defined for research?", "expected_files": ["backend/research/tasks.py"]},
+    {"question": "Where is email notification logic implemented?", "expected_files": ["backend/notifications/email.py"]},
+    {"question": "What does the scheduler app's models look like?", "expected_files": ["backend/scheduler/models.py"]},
+    {"question": "Where are Django settings configured?", "expected_files": ["backend/config/settings/base.py"]},
+    {"question": "Where is the React entry point that renders the app?", "expected_files": ["frontend/src/main.jsx"]},
+    {"question": "Where is the WebSocket hook used on the frontend?", "expected_files": ["frontend/src/hooks/useWebSocket.js"]},
+    {"question": "What does the Dashboard page component do?", "expected_files": ["frontend/src/pages/Dashboard.jsx"]},
+    {"question": "How is the Django backend service configured in docker-compose?", "expected_files": ["docker-compose.yml"]}
+  ]
+}

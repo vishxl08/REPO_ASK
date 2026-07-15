@@ -1,0 +1,17 @@
+fastapi
+uvicorn[standard]
+python-dotenv
+gitpython
+tree-sitter
+tree-sitter-python
+tree-sitter-javascript
+tree-sitter-typescript
+tree-sitter-java
+tree-sitter-go
+sentence-transformers
+chromadb
+rank-bm25
+groq
+python-multipart
+click
+rich

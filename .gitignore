@@ -1,0 +1,10 @@
+backend/.env
+backend/chroma_store/
+backend/metadata.db
+backend/__pycache__/
+backend/**/__pycache__/
+backend/*.egg-info/
+.venv/
+venv/
+node_modules/
+frontend/dist/
