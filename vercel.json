@@ -4,36 +4,9 @@
     "frontend": {
       "root": "frontend",
       "framework": "vite"
-    },
-    "backend": {
-      "root": "backend",
-      "framework": "fastapi",
-      "entrypoint": "main:app",
-      "installCommand": "pip install --extra-index-url https://download.pytorch.org/whl/cpu -r requirements.txt",
-      "functions": {
-        "main.py": {
-          "maxDuration": 60
-        }
-      },
-      "routes": [
-        {
-          "src": "/api/(.*)",
-          "transforms": [
-            {
-              "type": "request.path",
-              "op": "set",
-              "args": "/$1"
-            }
-          ]
-        }
-      ]
     }
   },
   "rewrites": [
-    {
-      "source": "/api(/.*)?",
-      "destination": { "service": "backend" }
-    },
     {
       "source": "/(.*)",
       "destination": { "service": "frontend" }
