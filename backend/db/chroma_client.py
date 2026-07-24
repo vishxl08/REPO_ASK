@@ -3,9 +3,10 @@ import os
 import chromadb
 
 from ingestion.chunker import CodeChunk
+from paths import data_dir
 
 _client = None
-PERSIST_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), "chroma_store")
+PERSIST_DIR = os.path.join(data_dir(), "chroma_store")
 
 
 def get_chroma_client():

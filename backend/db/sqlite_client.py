@@ -3,8 +3,9 @@ import os
 import sqlite3
 
 from ingestion.chunker import CodeChunk
+from paths import data_dir
 
-DB_PATH = os.path.join(os.path.dirname(os.path.dirname(__file__)), "metadata.db")
+DB_PATH = os.path.join(data_dir(), "metadata.db")
 
 
 def _connect() -> sqlite3.Connection:
