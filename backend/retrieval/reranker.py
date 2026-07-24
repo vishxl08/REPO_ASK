@@ -1,3 +1,4 @@
+import torch
 from sentence_transformers import CrossEncoder
 
 # General-purpose, compact cross-encoder (~80MB). A cross-encoder scores
@@ -13,7 +14,7 @@ def get_model() -> CrossEncoder:
     global _model
     if _model is None:
         print(f"Loading re-ranking model '{MODEL_NAME}' (first run downloads ~80MB)...")
-        _model = CrossEncoder(MODEL_NAME)
+        _model = CrossEncoder(MODEL_NAME, model_kwargs={"torch_dtype": torch.float16})
         print("Re-ranking model ready.")
     return _model
 

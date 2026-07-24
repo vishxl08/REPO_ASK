@@ -1,10 +1,17 @@
+import os
+
+import torch
 from sentence_transformers import SentenceTransformer
 
 from ingestion.chunker import CodeChunk
 
-MODEL_NAME = "microsoft/codebert-base"
-# codebert-base is specifically trained on code — much better than
-# all-MiniLM-L6-v2 for retrieving code by natural language queries
+# codebert-base is specifically trained on code -- much better than
+# all-MiniLM-L6-v2 for retrieving code by natural language queries (see
+# backend/eval/RESULTS.md). On RAM-constrained hosts (e.g. Render's free
+# 512MB tier) it doesn't fit in memory alongside torch's own ~220MB baseline
+# overhead, so REPOMIND_EMBEDDING_MODEL lets a deployment override it --
+# local dev, the CLI, and the eval harness all keep the full model by default.
+MODEL_NAME = os.environ.get("REPOMIND_EMBEDDING_MODEL", "microsoft/codebert-base")
 
 _model: SentenceTransformer | None = None
 
@@ -13,7 +20,9 @@ def get_model() -> SentenceTransformer:
     global _model
     if _model is None:
         print(f"Loading embedding model '{MODEL_NAME}' (first run downloads ~500MB)...")
-        _model = SentenceTransformer(MODEL_NAME)
+        # fp16 roughly halves resident memory with no change to output quality
+        # on the CPU inference paths we use -- matters on RAM-constrained hosts
+        _model = SentenceTransformer(MODEL_NAME, model_kwargs={"torch_dtype": torch.float16})
         print("Embedding model ready.")
     return _model
 
