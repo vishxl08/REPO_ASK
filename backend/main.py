@@ -4,19 +4,7 @@ import shutil
 import tempfile
 import time
 
-try:
-    import groq
-except ModuleNotFoundError:
-    import subprocess
-    import sys
-
-    print("=== DIAGNOSTIC: groq import failed ===", flush=True)
-    print(f"python: {sys.executable} {sys.version}", flush=True)
-    print(f"cwd: {os.getcwd()}", flush=True)
-    print(f"__file__ dir contents: {os.listdir(os.path.dirname(os.path.abspath(__file__)))}", flush=True)
-    print("=== pip list ===", flush=True)
-    subprocess.run([sys.executable, "-m", "pip", "list"], check=False)
-    raise
+import groq
 from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
