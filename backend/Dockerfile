@@ -12,7 +12,7 @@ WORKDIR /app
 ENV HF_HOME=/app/.cache/huggingface
 
 # CPU-only torch first — sentence-transformers would otherwise pull the much
-# larger CUDA build, which is wasted weight on a CPU-only Space.
+# larger CUDA build, which is wasted weight on a CPU-only host.
 RUN pip install --no-cache-dir torch --index-url https://download.pytorch.org/whl/cpu
 
 COPY requirements.txt .
