@@ -10,10 +10,17 @@ from generation.generator import generate_answer
 from ingestion.chunker import chunk_file
 from ingestion.embedder import embed_chunks
 from ingestion.file_filter import get_all_files, hash_file
-from ingestion.metadata import record_ingestion
 from retrieval.hybrid_search import hybrid_search_multi
 from retrieval.query_rewriter import contextualize_query, rewrite_query
 from timing import timed
+
+# Files per embed+store batch during ingestion. Chunking/embedding/storing in
+# batches instead of all-at-once bounds peak memory to roughly one batch's
+# worth of chunks regardless of total repo size -- otherwise a large repo
+# accumulates every chunk and embedding in memory before writing anything,
+# which is what was crashing ingestion of real-sized repos on RAM-constrained
+# hosts even after the model itself was made lighter.
+INGEST_BATCH_SIZE = 20
 
 
 def to_posix_relpath(path: str, start: str) -> str:
@@ -21,28 +28,41 @@ def to_posix_relpath(path: str, start: str) -> str:
 
 
 def run_ingestion_pipeline(repo_path: str, repo_id: str, repo_name: str, source_url: str) -> dict:
-    """clone/extract already done by caller. filter -> chunk -> embed -> store -> record."""
+    """clone/extract already done by caller. filter -> chunk -> embed -> store, in batches."""
     files = get_all_files(repo_path)
     if not files:
         raise ValueError("No supported code files found in this repository.")
 
-    chunks = []
-    for file_path in files:
-        chunks.extend(chunk_file(file_path, repo_path, repo_id))
+    total_chunks = 0
+    languages: set[str] = set()
+    file_hashes: dict[str, str] = {}
 
-    embeddings = embed_chunks(chunks) if chunks else []
-    store_chunks(repo_id, chunks, embeddings)
-    stats = record_ingestion(repo_id, repo_name, source_url, len(files), chunks)
+    for i in range(0, len(files), INGEST_BATCH_SIZE):
+        batch_files = files[i : i + INGEST_BATCH_SIZE]
+        batch_chunks = []
+        for file_path in batch_files:
+            batch_chunks.extend(chunk_file(file_path, repo_path, repo_id))
 
-    file_hashes = {to_posix_relpath(f, repo_path): hash_file(f) for f in files}
+        if batch_chunks:
+            embeddings = embed_chunks(batch_chunks)
+            store_chunks(repo_id, batch_chunks, embeddings)
+            sqlite_client.insert_chunks(repo_id, batch_chunks)
+            total_chunks += len(batch_chunks)
+            languages.update(c.language for c in batch_chunks)
+
+        for f in batch_files:
+            file_hashes[to_posix_relpath(f, repo_path)] = hash_file(f)
+
+    sorted_languages = sorted(languages)
+    sqlite_client.insert_repo(repo_id, repo_name, source_url, len(files), total_chunks, sorted_languages)
     sqlite_client.upsert_file_hashes(repo_id, file_hashes)
 
     return {
         "repo_id": repo_id,
         "repo_name": repo_name,
-        "total_files": stats["total_files"],
-        "total_chunks": stats["total_chunks"],
-        "languages": stats["languages"],
+        "total_files": len(files),
+        "total_chunks": total_chunks,
+        "languages": sorted_languages,
     }
 
 
